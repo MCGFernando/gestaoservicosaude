@@ -26,7 +26,7 @@ namespace GestaoServicoSaude.Services
 
         public async Task<IEnumerable<Pais>> GetAllAsync()
         {
-            return _context.Pais.ToListAsync() == null ? throw new InvalidOperationException() : await _context.Pais.ToListAsync();
+            return await _context.Pais.ToListAsync();
         }
 
         public async Task<Pais> GetByIdAsync(int id)
@@ -36,12 +36,37 @@ namespace GestaoServicoSaude.Services
                 throw new ArgumentNullException(nameof(id), "");
             }
 
-            return _context.Pais.FirstOrDefaultAsync(entity => entity.Id == id) == null ? throw new InvalidOperationException() : await _context.Pais.FirstOrDefaultAsync(entity => entity.Id == id);
+            return await _context.Pais.FirstOrDefaultAsync(entity => entity.Id == id);
         }
 
-        public Task UpdateAsync(Pais entity)
+        public async Task UpdateAsync(Pais entity)
         {
-            throw new NotImplementedException();
+            if (entity == null)
+            {
+                throw new ArgumentNullException(nameof(entity));
+            }
+
+            bool hasAny = await _context.Pais.AnyAsync(e => e.Id == entity.Id);
+
+            if (!hasAny)
+            {
+                throw new ArgumentException();
+            }
+            try
+            {
+                _context.Pais.Update(entity);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<bool> PaisExists(int id)
+        {
+            bool hasAny = await _context.Pais.AnyAsync(e => e.Id == id);
+            return hasAny;
         }
     }
 }

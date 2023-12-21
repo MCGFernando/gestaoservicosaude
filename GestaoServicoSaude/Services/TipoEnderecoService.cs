@@ -34,7 +34,7 @@ namespace GestaoServicoSaude.Services
 
         public async Task<IEnumerable<TipoEndereco>> GetAllAsync()
         {
-            return _context.TipoEndereco.ToListAsync() == null ? throw new InvalidOperationException() : await _context.TipoEndereco.ToListAsync();
+            return  await _context.TipoEndereco.ToListAsync();
         }
 
         public async Task<TipoEndereco> GetByIdAsync(int id)
@@ -44,12 +44,37 @@ namespace GestaoServicoSaude.Services
                 throw new ArgumentNullException(nameof(id), "");
             }
 
-            return _context.TipoEndereco.FirstOrDefaultAsync(entity => entity.Id == id) == null ? throw new InvalidOperationException() : await _context.TipoEndereco.FirstOrDefaultAsync(entity => entity.Id == id);
+            return await _context.TipoEndereco.FirstOrDefaultAsync(entity => entity.Id == id);
         }
 
-        public Task UpdateAsync(TipoEndereco entity)
+        public async Task UpdateAsync(TipoEndereco entity)
         {
-            throw new NotImplementedException();
+            if (entity == null)
+            {
+                throw new ArgumentNullException(nameof(entity));
+            }
+
+            bool hasAny = await _context.TipoEndereco.AnyAsync(e => e.Id == entity.Id);
+
+            if (!hasAny)
+            {
+                throw new ArgumentException();
+            }
+            try
+            {
+                _context.TipoEndereco.Update(entity);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<bool> TipoEnderecoExists(int id)
+        {
+            bool hasAny = await _context.TipoEndereco.AnyAsync(e => e.Id == id);
+            return hasAny;
         }
     }
 }

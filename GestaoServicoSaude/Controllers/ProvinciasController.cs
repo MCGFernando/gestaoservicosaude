@@ -7,91 +7,95 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using GestaoServicoSaude.Data;
 using GestaoServicoSaude.Models;
+using GestaoServicoSaude.Services;
 
 namespace GestaoServicoSaude.Controllers
 {
-    public class TipoEnderecoesController : Controller
+    public class ProvinciasController : Controller
     {
+        private readonly ProvinciaService _service;
         private readonly Context _context;
 
-        public TipoEnderecoesController(Context context)
+        public ProvinciasController( ProvinciaService service, Context context)
         {
-            _context = context;
+            _service = service;
+            _context = context; 
         }
 
-        // GET: TipoEnderecoes
+        // GET: Provincias
         public async Task<IActionResult> Index()
         {
-
-              return _context.TipoEndereco != null ? 
-                          View(await _context.TipoEndereco.ToListAsync()) :
-                          Problem("Entity set 'Context.TipoEndereco'  is null.");
+            
+            return View(await _service.GetAllAsync());
         }
 
-        // GET: TipoEnderecoes/Details/5
+        // GET: Provincias/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.TipoEndereco == null)
+            if (id == null )
             {
                 return NotFound();
             }
 
-            var tipoEndereco = await _context.TipoEndereco
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (tipoEndereco == null)
+            var provincia = await _service.GetByIdAsync(id.Value);
+
+            if (provincia == null)
             {
                 return NotFound();
             }
 
-            return View(tipoEndereco);
+            return View(provincia);
         }
 
-        // GET: TipoEnderecoes/Create
+        // GET: Provincias/Create
         public IActionResult Create()
         {
+            ViewData["PaisId"] = new SelectList(_context.Pais, "Id", "Nome");
             return View();
         }
 
-        // POST: TipoEnderecoes/Create
+        // POST: Provincias/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Tipo,Descricao")] TipoEndereco tipoEndereco)
+        public async Task<IActionResult> Create([Bind("Id,Codigo,Nome,PaisId")] Provincia provincia)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(tipoEndereco);
-                await _context.SaveChangesAsync();
+               
+                await _service.AddAsync(provincia);
                 return RedirectToAction(nameof(Index));
             }
-            return View(tipoEndereco);
+            ViewData["PaisId"] = new SelectList(_context.Pais, "Id", "Nome", provincia.PaisId);
+            return View(provincia);
         }
 
-        // GET: TipoEnderecoes/Edit/5
+        // GET: Provincias/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.TipoEndereco == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var tipoEndereco = await _context.TipoEndereco.FindAsync(id);
-            if (tipoEndereco == null)
+            var provincia = await _service.GetByIdAsync(id.Value);
+            if (provincia == null)
             {
                 return NotFound();
             }
-            return View(tipoEndereco);
+            ViewData["PaisId"] = new SelectList(_context.Pais, "Id", "Nome", provincia.PaisId);
+            return View(provincia);
         }
 
-        // POST: TipoEnderecoes/Edit/5
+        // POST: Provincias/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Tipo,Descricao")] TipoEndereco tipoEndereco)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Codigo,Nome,PaisId")] Provincia provincia)
         {
-            if (id != tipoEndereco.Id)
+            if (id != provincia.Id)
             {
                 return NotFound();
             }
@@ -100,12 +104,11 @@ namespace GestaoServicoSaude.Controllers
             {
                 try
                 {
-                    _context.Update(tipoEndereco);
-                    await _context.SaveChangesAsync();
+                    await _service.UpdateAsync(provincia);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TipoEnderecoExists(tipoEndereco.Id))
+                    if (!await _service.ProvinciaExists(provincia.Id))
                     {
                         return NotFound();
                     }
@@ -116,49 +119,50 @@ namespace GestaoServicoSaude.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(tipoEndereco);
+            ViewData["PaisId"] = new SelectList(_context.Pais, "Id", "Nome", provincia.PaisId);
+            return View(provincia);
         }
 
-        // GET: TipoEnderecoes/Delete/5
+        // GET: Provincias/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.TipoEndereco == null)
+            /*if (id == null || _context.Provincia == null)
             {
                 return NotFound();
             }
 
-            var tipoEndereco = await _context.TipoEndereco
+            var provincia = await _context.Provincia
+                .Include(p => p.Pais)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (tipoEndereco == null)
+            if (provincia == null)
             {
                 return NotFound();
             }
 
-            return View(tipoEndereco);
+            return View(provincia);*/
+            throw new NotImplementedException();
         }
 
-        // POST: TipoEnderecoes/Delete/5
+        // POST: Provincias/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.TipoEndereco == null)
+            /*if (_context.Provincia == null)
             {
-                return Problem("Entity set 'Context.TipoEndereco'  is null.");
+                return Problem("Entity set 'Context.Provincia'  is null.");
             }
-            var tipoEndereco = await _context.TipoEndereco.FindAsync(id);
-            if (tipoEndereco != null)
+            var provincia = await _context.Provincia.FindAsync(id);
+            if (provincia != null)
             {
-                _context.TipoEndereco.Remove(tipoEndereco);
+                _context.Provincia.Remove(provincia);
             }
             
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index));*/
+            throw  new NotImplementedException(nameof(DeleteConfirmed));
         }
 
-        private bool TipoEnderecoExists(int id)
-        {
-          return (_context.TipoEndereco?.Any(e => e.Id == id)).GetValueOrDefault();
-        }
+        
     }
 }

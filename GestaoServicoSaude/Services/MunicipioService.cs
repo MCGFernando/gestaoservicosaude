@@ -27,7 +27,7 @@ namespace GestaoServicoSaude.Services
 
         public async Task<IEnumerable<Municipio>> GetAllAsync()
         {
-            return _context.Municipio.ToListAsync() == null ? throw new InvalidOperationException() : await _context.Municipio.ToListAsync();
+            return await _context.Municipio.Include(m => m.Provincia).ToListAsync();
         }
 
         public async Task<Municipio> GetByIdAsync(int id)
@@ -37,12 +37,37 @@ namespace GestaoServicoSaude.Services
                 throw new ArgumentNullException(nameof(id), "");
             }
 
-            return _context.Municipio.FirstOrDefaultAsync(entity => entity.Id == id) == null ? throw new InvalidOperationException() : await _context.Municipio.FirstOrDefaultAsync(entity => entity.Id == id);
+            return await _context.Municipio.Include(m => m.Provincia).FirstOrDefaultAsync(entity => entity.Id == id);
         }
 
-        public Task UpdateAsync(Municipio entity)
+        public async Task UpdateAsync(Municipio entity)
         {
-            throw new NotImplementedException();
+            if (entity == null)
+            {
+                throw new ArgumentNullException(nameof(entity));
+            }
+
+            bool hasAny = await _context.Municipio.AnyAsync(e => e.Id == entity.Id);
+
+            if (!hasAny)
+            {
+                throw new ArgumentException();
+            }
+            try
+            {
+                _context.Municipio.Update(entity);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<bool> MunicipioExists(int id)
+        {
+            bool hasAny = await _context.Municipio.AnyAsync(e => e.Id == id);
+            return hasAny;
         }
     }
 }
