@@ -25,12 +25,12 @@ namespace GestaoServicoSaude.Services
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<Municipio>> GetAllAsync()
+        public async Task<IEnumerable<Municipio>> GetAllAsync()
         {
             return _context.Municipio.ToListAsync() == null ? throw new InvalidOperationException() : await _context.Municipio.ToListAsync();
         }
 
-        public Task<Municipio> GetByIdAsync(int id)
+        public async Task<Municipio> GetByIdAsync(int id)
         {
             if (id == null)
             {
