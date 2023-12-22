@@ -49,7 +49,8 @@ namespace GestaoServicoSaude.Controllers
         // GET: Municipios/Create
         public IActionResult Create()
         {
-            ViewData["ProvinciaId"] = new SelectList(_context.Provincia, "Id", "Nome");
+            ViewData["PaisId"] = new SelectList(_context.Pais, "Id", "Nome",1);
+            ViewData["ProvinciaId"] = new SelectList(_context.Provincia, "Id", "Nome", 1, "PaisId");
             return View();
         }
 
@@ -161,6 +162,18 @@ namespace GestaoServicoSaude.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));*/
             throw new NotImplementedException();
+        }
+
+        /* Requests Adicionais */
+
+        [HttpGet]
+        public IActionResult GetProvinciasPorPaisId(int paisId)
+        {
+            // Consulta no banco de dados para obter as províncias com base no PaisId
+            var provincias = _service.GetProvinciasByPaisIdAsync(paisId);
+
+            // Retorna as províncias no formato JSON
+            return Json(provincias);
         }
     }
 }

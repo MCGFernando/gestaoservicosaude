@@ -14,6 +14,8 @@
         public Pessoa? Pessoa { get; set; }
         public int? TipoEnderecoId { get; set; }
         public TipoEndereco? TipoEndereco { get; set; }
+        public int? EmpresaId { get; set; }
+        public Empresa? Empresa { get; set; }
 
     }
 }

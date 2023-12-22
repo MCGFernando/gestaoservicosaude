@@ -69,5 +69,26 @@ namespace GestaoServicoSaude.Services
             bool hasAny = await _context.Municipio.AnyAsync(e => e.Id == id);
             return hasAny;
         }
+
+        /* Methodos Adicionais */
+
+        public async Task<IEnumerable<Municipio>> GetProvinciasByPaisIdAsync(int id)
+        {
+            
+            if (id == null)
+            {
+                throw new ArgumentNullException(nameof(id), "");
+            }
+
+            var municipios = from m in _context.Municipio
+                             join pr in _context.Provincia on m.ProvinciaId equals pr.Id
+                             where pr.PaisId == id
+                             select new Municipio{ 
+                             Id =    m.Id, 
+                              Nome =   m.Nome 
+                             };
+
+            return await municipios.ToListAsync();
+        }
     }
 }
