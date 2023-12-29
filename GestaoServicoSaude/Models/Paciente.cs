@@ -10,15 +10,17 @@ namespace GestaoServicoSaude.Models
         public double Altura { get; set; }
         public TipoSanguineo TipoSanguineo { get; set; }
         public bool Alergia { get; set; } = false;
-        //public List<string> Alergias { get; set; }
+        public List<PacienteAlergia> Alergias { get; set; }
         public bool DoencaHereditaria { get; set; }
-        //public List<string> DoencasHereditarias { get; set; }
+        public List<PacienteDoencaHereditaria> DoencasHereditarias { get; set; }
         public bool Cirurgia { get; set; }
         public string CirurgiaDescricao { get; set; }
         public bool Activo { get; set; }    = true;
         public bool RecebeEmail { get; set; }    = true;
         public bool RecebeSMS { get; set; }    = true;
 
-           
+        public List<Contacto> Contacto { get; set; }
+        public List<Endereco> Endereco { get; set; }
+
     }
 }

@@ -26,5 +26,6 @@ namespace GestaoServicoSaude.Data
         public DbSet<GestaoServicoSaude.Models.Municipio>? Municipio { get; set; }
         public DbSet<GestaoServicoSaude.Models.Funcionario>? Funcionario { get; set; }
         public DbSet<GestaoServicoSaude.Models.Contacto>? Contacto { get; set; }
+        public DbSet<GestaoServicoSaude.Models.Empresa>? Empresa { get; set; }
     }
 }
